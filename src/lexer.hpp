@@ -7,47 +7,13 @@
 #include <map>
 #include <vector>
 
-
-typedef enum {
-    TOKEN_NONE,
-    TOKEN_STITCH,
-	TOKEN_IDENTIFIER,
-    TOKEN_STRING,
-    TOKEN_FILE,
-    TOKEN_NUMBER,
-	TOKEN_GOTO,
-	TOKEN_REWRITE,
-	TOKEN_COLON,
-	TOKEN_SYMBOL,
-	TOKEN_UNKNOWN,
-	TOKEN_ERROR,
-	TOKEN_EOF
-} TokenType;
-
-typedef enum {
-	SYMBOL_COLON,
-	SYMBOL_PARENS_LEFT,
-	SYMBOL_PARENS_RIGHT,
-	SYMBOL_BRACE_LEFT,
-	SYMBOL_BRACE_RIGHT,
-	SYMBOL_BRACKET_LEFT,
-	SYMBOL_BRACKET_RIGHT,
-	SYMBOL_ANGLE_BRACKET_LEFT,
-	SYMBOL_ANGLE_BRACKET_RIGHT,
-} SymbolType;
+#include "lexer_def.hpp"
 
 struct Keyword {
 	std::string str;
 	TokenType type;
 };
 
-static std::map<TokenType, std::string> TkMap;
-static std::map<std::string, TokenType> KwMap;
-static std::map<std::string, SymbolType> SmMap;
-
-typedef std::pair<std::string, TokenType> KwTk;
-typedef std::pair<TokenType, std::string> TkKw;
-typedef std::pair<std::string, SymbolType> StrSm;
 
 struct Token {
     TokenType type;
@@ -82,6 +48,17 @@ struct NumericToken : Token {
         output << "{" << typeAsStr << " " << value << "}";
     }
 };
+
+struct SymbolToken : Token {
+	SymbolType symbol;
+    SymbolToken():Token(TOKEN_SYMBOL) {}
+    SymbolToken(const SymbolType symbol):
+        Token(TOKEN_SYMBOL), symbol(symbol) {}
+    void write(std::ostream &output) const {
+		output << "{sym" << symbol << "}";
+    }
+};
+
 
 struct ErrorToken : Token {
 	std::string error_str;

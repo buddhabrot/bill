@@ -1,35 +1,11 @@
 #include "lexer.hpp"
 
-#define MAP_SYMBOL(str, symbol) MAP_TOKEN(str, TOKEN_SYMBOL); \
-	SmMap.insert(StrSm(str, symbol));
-#define MAP_TOKEN_TYPE(meaning, str) TkMap.insert(TkKw((meaning), (str)))
-#define MAP_TOKEN(str, meaning) KwMap.insert(KwTk((str), (meaning)))
-
 // We shouldn't do this, but there's so many things we shouldn't do.
 using namespace std;
 
-static void buildSymbolMap() {
-	MAP_TOKEN("goto", TOKEN_GOTO);
-	MAP_TOKEN("rewrite", TOKEN_REWRITE);
-	MAP_SYMBOL(":", SYMBOL_COLON);
-	MAP_SYMBOL("(", SYMBOL_PARENS_LEFT);
-	MAP_SYMBOL(")", SYMBOL_PARENS_RIGHT);
-	MAP_SYMBOL("{", SYMBOL_BRACE_LEFT);
-	MAP_SYMBOL("}", SYMBOL_BRACE_RIGHT);	
-}
-
-static void buildTokenMap() {
-	MAP_TOKEN_TYPE(TOKEN_GOTO, "goto");
-	MAP_TOKEN_TYPE(TOKEN_UNKNOWN, "unknown");
-	MAP_TOKEN_TYPE(TOKEN_IDENTIFIER, "id");
-	MAP_TOKEN_TYPE(TOKEN_STRING, "str");
-	MAP_TOKEN_TYPE(TOKEN_NUMBER, "num");
-	MAP_TOKEN_TYPE(TOKEN_FILE, "file");
-}
-
 static void init() {
-	buildSymbolMap();
-	buildTokenMap();
+	buildSymbolMap(); // defined in lexer_def.hpp
+	buildTokenMap(); // defined in lexer_def.hpp
 }
 
 static std::list<Token*> tokens;
@@ -119,8 +95,16 @@ static TokenType get_next_token() {
 	}
 
 	// other symbols? read all non-alnum characters and then try the symbol map
-	while(!isalnum(last_char) && !isspace(last_char)) {
+	while(!isalnum(last_char) && !isspace(last_char) && last_char != EOF) {
 		last_token->data += last_char;
+		last_char = eat_char();
+	}
+	if(SmMap.find(last_token->data) != SmMap.end()) {
+		SymbolType found_symbol = SmMap[last_token->data];
+		delete last_token;
+		last_token = new SymbolToken(found_symbol);	
+		found_token = last_token -> type;
+		return found_token;
 	}
 
 	// we don't know this character as the start of a token
