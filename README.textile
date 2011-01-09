@@ -1,0 +1,17 @@
+h1. About
+
+Bill is a programming language with a small grammar. It is designed as an experiment with LLVM compiling. Without going into too much detail, Bill uses the following concepts:
+* Allow to rewrite/replace part of the program code at run-time using the "rewrite" statement.
+* Gotos are allowed and even encouraged. Bill does not know the concept of "functions" or stack, if you need to call a routine you just use goto and are responsible for whatever this routine does to the memory once it's finished.
+* Treat files like any other datatype: <pre>
+<code>
+file = <"origin.txt">
+new_file = <"dest.txt">
+new_file = file + file
+</code>
+</pre>
+After execution, dest.txt will be overwritten with twice the content of file.
+
+h1. Why?
+
+Mu.
